@@ -185,7 +185,8 @@ class StatisticsNetwork(nn.Module):
             nn.Linear(512, 1),
         )
 
-    def forward(self, x):
+    def forward(self, x, z):
+        x = torch.cat((x, z), dim=-1)
         return self.layers(x)
 
 
