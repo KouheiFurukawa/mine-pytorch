@@ -174,6 +174,16 @@ class GaussianLayer(nn.Module):
 class StatisticsNetwork(nn.Module):
     def __init__(self, x_dim, z_dim, device):
         super().__init__()
+        self.fc_x = nn.Sequential(
+            nn.Linear(x_dim, x_dim),
+            nn.BatchNorm1d(x_dim),
+            nn.ELU()
+        )
+        self.fc_z = nn.Sequential(
+            nn.Linear(z_dim, z_dim),
+            nn.BatchNorm1d(z_dim),
+            nn.ELU()
+        )
         self.layers = nn.Sequential(
             GaussianLayer(std=0.3, device=device),
             nn.Linear(x_dim + z_dim, 512),
@@ -186,6 +196,8 @@ class StatisticsNetwork(nn.Module):
         )
 
     def forward(self, x, z):
+        x = self.fc_x(x)
+        z = self.fc_z(z)
         x = torch.cat((x, z), dim=-1)
         return self.layers(x)
 
